@@ -45,8 +45,79 @@ var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
+$(".list-group").on("click", "p", function(){
+  var text = $(this)
+            .text()
+            .trim();
 
+  var editInput = $("<textarea>")
+                  .addClass("form-control")
+                  .val(text); 
 
+  $(this).replaceWith(editInput);
+  editInput.trigger("focus");
+});
+
+$(".list-group").on("blur", "textarea", function () {
+    var text = $(this)
+              .val()
+              .trim();
+
+    var status = $(this).closest(".list-group")
+                  .attr("id")
+                  .replace("list-", "");
+
+    var index = $(this).closest(".list-group-item")
+                .index();
+
+    tasks[status][index].text = text;
+    saveTasks();
+
+    var taskP = $("<span>")
+                .addClass("m-1")
+                .text(text);
+
+    $(this).replaceWith(taskP);
+});
+
+$(".list-group").on("click", "span", function(){
+  var maxDate = $(this)
+    .text()
+    .trim();
+
+  var dateInput = $("<input>")
+    .attr("type", "text")
+    .addClass("form-control")
+    .val(maxDate);
+
+  $(this).replaceWith(dateInput);
+
+  dateInput.trigger("focus");
+});
+
+$(".list-group").on("blur", "input", function(){
+  var status = $(this)
+    .closest(".list-group")
+    .attr("id")
+    .replace("list-", "");
+
+  var index = $(this)
+    .closest(".list-group-item")
+    .index();
+
+  var maxDate = $(this)
+    .val()
+    .trim();
+
+  tasks[status][index].date = maxDate;
+
+  var pEl = $("<p>")
+    .addClass("badge badge-primary bade-pill")
+    .text(maxDate);
+
+  $(this).replaceWith(pEl);
+  saveTasks()
+});
 
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function() {
