@@ -73,7 +73,7 @@ $(".list-group").on("blur", "textarea", function () {
     tasks[status][index].text = text;
     saveTasks();
 
-    var taskP = $("<span>")
+    var taskP = $("<p>")
                 .addClass("m-1")
                 .text(text);
 
@@ -111,7 +111,7 @@ $(".list-group").on("blur", "input", function(){
 
   tasks[status][index].date = maxDate;
 
-  var pEl = $("<p>")
+  var pEl = $("<span>")
     .addClass("badge badge-primary bade-pill")
     .text(maxDate);
 
