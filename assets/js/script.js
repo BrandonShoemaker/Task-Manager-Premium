@@ -149,18 +149,11 @@ $(".card .list-group").sortable({
 });
 
 $("#trash").droppable({
-  accept: $(".card .list-group .list-group-item"),
+  accept: ".list-group-item",
   tolerance: "touch",
   drop: function(event, ui){
     ui.draggable.remove();
-  },
-  over: function(event){
-    console.log("over");
-  },
-  out: function(event){
-    console.log("out");
   }
-
 });
 
 $(".list-group").on("blur", "input", function(){
