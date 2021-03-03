@@ -95,6 +95,74 @@ $(".list-group").on("click", "span", function(){
   dateInput.trigger("focus");
 });
 
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  revert: 100,
+  tolerance: "pointer",
+  scroll: false,
+  helper: "clone",
+  activate: function(event){
+    console.log("activate", this);
+    console.log(this);
+  },
+  deactivate: function(event){
+    console.log("deactivate ", this);
+  },
+  over: function(event){
+    console.log("over ", event.target);
+  },
+  out: function(event){
+    console.log("out ", event.target);
+  },
+  update: function(event){
+    var tempArr = [];
+    $(this).children().each(function(){
+      var status = $(this)
+        .closest(".list-group")
+        .attr("id")
+        .replace("list-", "");
+
+      var index = $(this)
+        .index();
+
+      var date = $(this)
+        .find("span")
+        .text()
+        .trim();
+
+      var text = $(this)
+        .find("p")
+        .text()
+        .trim();
+    
+
+      tempArr.push({
+        text: text,
+        date: date
+      });
+      tasks[status] = tempArr;
+      saveTasks();
+
+    });
+  }
+
+});
+
+$("#trash").droppable({
+  accept: $(".card .list-group .list-group-item"),
+  tolerance: "touch",
+  drop: function(event, ui){
+    ui.draggable.remove();
+  },
+  over: function(event){
+    console.log("over");
+  },
+  out: function(event){
+    console.log("out");
+  }
+
+});
+
 $(".list-group").on("blur", "input", function(){
   var status = $(this)
     .closest(".list-group")
