@@ -13,7 +13,7 @@ var createTask = function(taskText, taskDate, taskList) {
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
-
+  auditTask(taskLi);
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
 };
@@ -92,12 +92,43 @@ $(".list-group").on("click", "span", function(){
 
   $(this).replaceWith(dateInput);
 
+  dateInput.datepicker({
+    minDate: 0,
+    onClose: function(){
+      $(this).trigger("change");
+    }
+  });
+
   dateInput.trigger("focus");
+});
+
+$(".list-group").on("change", "input[type='text']", function(){
+  var status = $(this)
+    .closest(".list-group")
+    .attr("id")
+    .replace("list-", "");
+
+  var index = $(this)
+    .closest(".list-group-item")
+    .index();
+
+  var maxDate = $(this)
+    .val()
+    .trim();
+
+  tasks[status][index].date = maxDate;
+
+  var pEl = $("<span>")
+    .addClass("badge badge-primary bade-pill")
+    .text(maxDate);
+
+  $(this).replaceWith(pEl);
+  saveTasks();
+  auditTask($(pEl).closest(".list-group-item"));
 });
 
 $(".card .list-group").sortable({
   connectWith: $(".card .list-group"),
-  revert: 100,
   tolerance: "pointer",
   scroll: false,
   helper: "clone",
@@ -156,29 +187,24 @@ $("#trash").droppable({
   }
 });
 
-$(".list-group").on("blur", "input", function(){
-  var status = $(this)
-    .closest(".list-group")
-    .attr("id")
-    .replace("list-", "");
-
-  var index = $(this)
-    .closest(".list-group-item")
-    .index();
-
-  var maxDate = $(this)
-    .val()
+// audits
+function auditTask(taskLi){
+  var date = $(taskLi)
+    .find("span")
+    .text()
     .trim();
 
-  tasks[status][index].date = maxDate;
+  var time = moment(date, "L").set("hour", 17);
 
-  var pEl = $("<span>")
-    .addClass("badge badge-primary bade-pill")
-    .text(maxDate);
+  $(taskLi).removeClass("list-group-item-warning list-group-item-danger");
+  if(moment().isAfter(time)){
+    $(taskLi).addClass("list-group-item-danger");
+  }
+  else if(Math.abs(moment().diff(time, "days")) <= 2){
+    $(taskLi).addClass("list-group-item-warning");
+  }
+}
 
-  $(this).replaceWith(pEl);
-  saveTasks()
-});
 
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function() {
@@ -190,6 +216,11 @@ $("#task-form-modal").on("show.bs.modal", function() {
 $("#task-form-modal").on("shown.bs.modal", function() {
   // highlight textarea
   $("#modalTaskDescription").trigger("focus");
+});
+
+// date picker
+$("#modalDueDate").datepicker({
+  minDate: 0
 });
 
 // save button in modal was clicked
