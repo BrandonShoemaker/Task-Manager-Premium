@@ -135,18 +135,28 @@ $(".card .list-group").sortable({
   activate: function(event){
     console.log("activate", this);
     console.log(this);
+    $(this).addClass("dropover");
+    $(".trash-bottom").addClass("trash-bottom-drag");
   },
   deactivate: function(event){
     console.log("deactivate ", this);
+    $(this).removeClass("dropover");
+    $(".trash-bottom").removeClass("trash-bottom-drag");
   },
   over: function(event){
     console.log("over ", event.target);
+    $(this).addClass("dropover-active");
   },
   out: function(event){
     console.log("out ", event.target);
+    $(this).removeClass("dropover-active");
   },
   update: function(event){
     var tempArr = [];
+    if($(this).children().length === 0){
+      var id = $(this).attr("id").replace("list-", "");
+      tasks[id] = tempArr;
+    }
     $(this).children().each(function(){
       var status = $(this)
         .closest(".list-group")
@@ -172,9 +182,8 @@ $(".card .list-group").sortable({
         date: date
       });
       tasks[status] = tempArr;
-      saveTasks();
-
     });
+    saveTasks();
   }
 
 });
@@ -184,7 +193,14 @@ $("#trash").droppable({
   tolerance: "touch",
   drop: function(event, ui){
     ui.draggable.remove();
-  }
+    $(this).removeClass("trash-bottom-active");
+  },
+  over: function(event){
+    $(this).addClass("trash-bottom-active");
+  },
+  out: function(event){
+    $(this).removeClass("trash-bottom-active");
+  },
 });
 
 // audits
@@ -224,7 +240,8 @@ $("#modalDueDate").datepicker({
 });
 
 // save button in modal was clicked
-$("#task-form-modal .btn-primary").click(function() {
+$("#task-form-modal .btn-save").click(function() {
+  debugger;
   // get form values
   var taskText = $("#modalTaskDescription").val();
   var taskDate = $("#modalDueDate").val();
@@ -256,5 +273,8 @@ $("#remove-tasks").on("click", function() {
 
 // load tasks for the first time
 loadTasks();
+$(".card .list-group-item").each(function(index, el){
+  auditTask(el);
+}, 5000);
 
 
